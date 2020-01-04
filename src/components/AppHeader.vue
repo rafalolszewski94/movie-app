@@ -51,7 +51,6 @@ export default {
           const foundMovies = response.data.results.sort((a, b) => {
             return b.popularity - a.popularity;
           });
-          console.log(foundMovies);
         })
         .catch(error => {
           throw new Error(error);

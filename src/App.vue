@@ -24,7 +24,7 @@ export default {
           this.$store.dispatch("config/setConfig", response.data);
         })
         .catch(error => {
-          console.error(error);
+          throw new Error(error);
         });
     }
   }

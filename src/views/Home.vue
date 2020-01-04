@@ -38,7 +38,9 @@ export default class Home extends Vue {
       .then((response: ApiResponse<any>) => {
         this.trending = response.data;
       })
-      .catch((error: any) => console.error(error));
+      .catch((error: any) => {
+        throw new Error(error);
+      });
   }
 }
 </script>

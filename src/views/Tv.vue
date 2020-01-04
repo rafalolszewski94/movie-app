@@ -100,10 +100,6 @@ export default Vue.extend({
         });
       });
   },
-  beforeRouteUpdate(to, from, next) {
-    console.log("r update");
-    next();
-  },
 
   computed: {
     primaryFillColor() {
