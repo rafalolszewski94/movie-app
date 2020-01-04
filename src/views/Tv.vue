@@ -1,184 +1,169 @@
 <template>
   <div class="movie-detail">
-    <div v-if="error">Error occured</div>
-    <div v-if="loading">Loading...</div>
-    <template v-else>
-      <header>
-        <div
-          class="bg-image"
-          :style="
-            backgroundImage ? `background-image: url('${backgroundImage}')` : ``
-          "
-        />
-        <div class="container row">
-          <div class="details">
-            <h1>{{ title }}</h1>
-            <p class="overview">{{ movie.overview | truncate(160) }}</p>
-            <div class="rating-wrapper">
-              <div class="stars">
-                <unicon name="star-filled" :fill="primaryFillColor" />
-                <span>
-                  avg: {{ movie.vote_average.toFixed(0) }}/10, votes:
-                  {{ movie.vote_count }}
-                </span>
-              </div>
+    <header>
+      <div
+        class="bg-image"
+        :style="
+          backgroundImage ? `background-image: url('${backgroundImage}')` : ``
+        "
+      />
+      <div class="container row">
+        <div class="skeleton details-skeleton" v-if="loading"></div>
+        <div class="details" v-if="!loading && movie">
+          <h1>{{ title }}</h1>
+          <p class="overview">{{ movie.overview | truncate(160) }}</p>
+          <div class="rating-wrapper">
+            <div class="stars">
+              <unicon name="star-filled" :fill="primaryFillColor" />
+              <span>
+                avg: {{ movie.vote_average.toFixed(0) }}/10, votes:
+                {{ movie.vote_count }}
+              </span>
             </div>
           </div>
-
-          <lazy-image
-            :src="poster"
-            :src-placeholder="smallPoster"
-            use-picture
-          />
         </div>
-      </header>
 
-      <main>
-        <div class="container">
-          <div class="cast">
-            <h5>Cast</h5>
+        <lazy-image
+          v-if="!loading && movie"
+          :src="poster"
+          :src-placeholder="smallPoster"
+          use-picture
+        />
+      </div>
+    </header>
 
-            <table>
-              <tbody>
-                <tr v-for="person in shortenedCast" :key="person.id">
-                  <td>
-                    <lazy-image
-                      :src="getPersonPicture(person.profile_path)"
-                      :src-placeholder="
-                        getPersonPicture(person.profile_path, 'w45')
-                      "
-                    />
-                  </td>
-                  <td>{{ person.name }}</td>
-                  <td>{{ person.character }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <main>
+      <div class="container">
+        <div class="cast">
+          <h5>Cast</h5>
+
+          <table>
+            <tbody>
+              <tr v-for="person in shortenedCast" :key="person.id">
+                <td>
+                  <lazy-image
+                    :src="getPersonPicture(person.profile_path)"
+                    :src-placeholder="
+                      getPersonPicture(person.profile_path, 'w45')
+                    "
+                  />
+                </td>
+                <td>{{ person.name }}</td>
+                <td>{{ person.character }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </main>
-    </template>
+      </div>
+    </main>
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
-import Component from "vue-class-component";
 import { getImage } from "@/utils";
-import variables from "@/styles/_variables.scss";
-import { ImageSizes, movie } from "@/types";
-import { ApiResponse } from "apisauce";
-import MovieWithCastType = movie.MovieWithCastType;
+import scssVariables from "@/styles/_variables.scss";
 import { api } from "@/api";
 
-@Component({})
-export default class Movie extends Vue {
-  private movie?: MovieWithCastType = undefined;
+export default Vue.extend({
+  data: () => ({
+    movie: undefined,
+    initialized: false,
+    loading: true,
+    data: {}
+  }),
 
-  private initialized: boolean = false;
-  private loading: boolean = true;
-  private error: boolean = false;
-
-  beforeRouteEnter(
-    to: { name: string; params: { id: any } },
-    from: any,
-    next: any
-  ) {
-    const isTV = to.name === "tv";
-    const url = isTV ? `/tv/${to.params.id}` : `/movie/${to.params.id}`;
+  beforeRouteEnter(to, from, next) {
     api
-      .get(url, {
+      .get(`/tv/${to.params.id}`, {
         append_to_response: "credits"
       })
-      .then((response: ApiResponse<any>) => {
-        next(vm => {
+      .then(response => {
+        next(async vm => {
           response.data.credits.cast.sort((a, b) => {
             return a.order - b.order;
           });
-          vm.setMovie(response.data, null, {
-            initialized: true,
-            loading: false
-          });
+          await vm.setData(true, "initialized");
+          await vm.setData(false, "loading");
+          await vm.setData(response.data, "movie");
           return vm;
         });
       })
-      .catch((error: any) => {
-        next(vm =>
-          vm.setMovie(null, error, {
-            initialized: true,
-            loading: false
-          })
-        );
+      .catch(error => {
+        next();
+      })
+      .finally(() => {
+        next(async vm => {
+          await vm.setData(true, "initialized");
+          await vm.setData(false, "loading");
+          return vm;
+        });
       });
-  }
-  get primaryFillColor() {
-    return variables.primary;
-  }
-  get shortenedCast() {
-    if (this.movie) {
-      return this.movie.credits.cast.slice(0, 10);
-    }
-    return [];
-  }
-  get selectedStars(): string | number {
-    if (!this.movie) return 0;
-    const star5 = this.movie.vote_count;
-    const star4 = this.movie.vote_count / 2;
-    const star3 = this.movie.vote_count / 3;
-    const star2 = this.movie.vote_count / 4;
-    const star1 = this.movie.vote_count / 5;
-    return (
-      (5 * star5 + 4 * star4 + 3 * star3 + 2 * star2 + star1) /
-      (star5 + star4 + star3 + star2 + star1)
-    ).toFixed(1);
-  }
-  get backgroundImage(): string | null {
-    if (!this.movie) return null;
-    return getImage(this.movie.backdrop_path);
-  }
-  get smallPoster(): string | null {
-    if (!this.movie) return null;
-    return getImage(this.movie.poster_path, "w45");
-  }
-  get poster(): string | null {
-    if (this.movie) {
-      return getImage(this.movie.poster_path);
-    }
-    return null;
-  }
-  get title() {
-    if (this.initialized && this.movie) {
-      if (this.movie.title) {
-        return this.movie.title;
+  },
+  beforeRouteUpdate(to, from, next) {
+    console.log("r update");
+    next();
+  },
+
+  computed: {
+    primaryFillColor() {
+      return scssVariables.primary;
+    },
+    shortenedCast() {
+      if (this.movie) {
+        return this.movie.credits.cast.slice(0, 10);
       }
-      return this.movie.name;
+      return [];
+    },
+    selectedStars() {
+      if (!this.movie) return 0;
+      const star5 = this.movie.vote_count;
+      const star4 = this.movie.vote_count / 2;
+      const star3 = this.movie.vote_count / 3;
+      const star2 = this.movie.vote_count / 4;
+      const star1 = this.movie.vote_count / 5;
+      return (
+        (5 * star5 + 4 * star4 + 3 * star3 + 2 * star2 + star1) /
+        (star5 + star4 + star3 + star2 + star1)
+      ).toFixed(1);
+    },
+    backgroundImage() {
+      if (!this.movie) return null;
+      return getImage(this.movie.backdrop_path);
+    },
+    smallPoster() {
+      if (!this.movie) return null;
+      return getImage(this.movie.poster_path, "w45");
+    },
+    poster() {
+      if (this.movie) {
+        return getImage(this.movie.poster_path);
+      }
+      return null;
+    },
+    title() {
+      if (this.initialized && this.movie) {
+        if (this.movie.title) {
+          return this.movie.title;
+        }
+        return this.movie.name;
+      }
+      return "";
     }
-    return "";
-  }
+  },
 
-  fetchTitle() {
-
-  }
-  getPersonPicture(path: string, size: ImageSizes = "w185") {
-    return getImage(path, size);
-  }
-  setMovie(
-    movie: MovieWithCastType,
-    err: { toString: () => boolean },
-    extra: { initialized: boolean; loading: boolean }
-  ) {
-    this.initialized = extra.initialized;
-    this.loading = extra.loading;
-    if (err) {
-      this.error = err.toString();
-    } else {
-      this.movie = movie;
+  methods: {
+    getPersonPicture(path, size = "w185") {
+      return getImage(path, size);
+    },
+    setData(data, key) {
+      this[key] = data;
+    },
+    isSelectedStar(starNumber) {
+      return this.selectedStars >= starNumber;
     }
   }
-  isSelectedStar(starNumber: number) {
-    return this.selectedStars >= starNumber;
-  }
-}
+});
 </script>
 
 <style scoped lang="scss">

@@ -1,4 +1,6 @@
-declare module namespace {
+import Movie from "@/views/Movie.vue";
+
+declare namespace movie {
   export interface Genre {
     id: number;
     name: string;
@@ -21,7 +23,7 @@ declare module namespace {
     name: string;
   }
 
-  export interface RootObject {
+  export interface MovieType {
     id: number;
     adult: boolean;
     backdrop_path: string;
@@ -43,9 +45,53 @@ declare module namespace {
     spoken_languages: SpokenLanguage[];
     status: string;
     tagline: string;
-    title: string;
+    title?: string;
+    name?: string;
     video: boolean;
     vote_average: number;
     vote_count: number;
+  }
+
+  export interface MovieWithCastType extends MovieType {
+    credits: {
+      cast: {
+        id: number;
+        profile_path: string;
+        name: string;
+        character: string;
+        order: number;
+      }[];
+    };
+  }
+
+  export interface TrendingObject extends MovieType {
+    media_type: "movie" | "tv" | "person";
+  }
+}
+
+export type ImageSizes =
+  | "w45"
+  | "w92"
+  | "w154"
+  | "w185"
+  | "w342"
+  | "w500"
+  | "w780"
+  | "original";
+
+declare namespace configuration {
+  export interface Images {
+    base_url: string;
+    secure_base_url: string;
+    backdrop_sizes: string[];
+    logo_sizes: string[];
+    poster_sizes: ImageSizes[];
+    profile_sizes: string[];
+    still_sizes: string[];
+  }
+
+  export interface RootObject {
+    images: Images;
+    change_keys: string[];
   }
 }
