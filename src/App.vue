@@ -9,7 +9,7 @@
 
 <script>
 import AppHeader from "@/components/AppHeader";
-import { api } from "@/api";
+import { request } from "@/api";
 
 export default {
   components: { AppHeader },
@@ -18,7 +18,7 @@ export default {
   },
   methods: {
     getConfig() {
-      api
+      request
         .get("/configuration")
         .then(response => {
           this.$store.dispatch("config/setConfig", response.data);

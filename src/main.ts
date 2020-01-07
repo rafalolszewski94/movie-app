@@ -4,21 +4,24 @@ import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
 import { sync } from "vuex-router-sync";
-import { api } from "@/api";
+import { request } from "@/api";
 import "@/styles/app.scss";
 import "./class-component-hooks";
-
-import Unicon from "vue-unicons";
-import { starFilled, star, search } from "@/customIcons";
 
 // @ts-ignore
 import { VLazyImagePlugin } from "v-lazy-image";
 import LazyImage from "@/components/LazyImage.vue";
+import vSelect from "vue-select";
 
 sync(store, router);
 
+function setup() {
+  store.dispatch("movies/fetchGenres");
+  store.dispatch("movies/fetchUpcomingMovies");
+}
+
 Vue.config.productionTip = false;
-Vue.prototype.$api = api;
+Vue.prototype.$api = request;
 Vue.filter("truncate", function(value: string, length: number) {
   length = length || 15;
   if (!value) return "";
@@ -31,12 +34,19 @@ Vue.filter("uppercase", function(value: string) {
 Vue.use(VLazyImagePlugin);
 Vue.component("lazy-image", LazyImage);
 
-// @ts-ignores
-Unicon.add([star, starFilled, search]);
-Vue.use(Unicon);
+// @ts-ignore
+vSelect.props.components.default = () => ({
+  OpenIndicator: {
+    render: (createElement: (arg0: string, arg1: string) => void) => createElement("span", "🔽")
+  }
+});
+Vue.component("v-select", vSelect);
 
 new Vue({
   router,
   store,
+  beforeCreate: function() {
+    setup();
+  },
   render: h => h(App)
 }).$mount("#app");

@@ -1,48 +1,113 @@
 <template>
   <div class="home container">
-    <movie-list title="Trending" :movie-list="trendingMovies" />
+    <movie-list title="Trending" :movie-list="trending.results">
+      <div slot="header_extra" class="header_extra">
+        <v-select
+          name="trendiing_type"
+          v-model="filtering.type"
+          id="trendiing_type-type"
+          @input="touch"
+          :clearable="false"
+          :searchable="false"
+          :options="['All', 'Movie', 'TV']"
+        >
+          <div slot="selected-option" slot-scope="option">
+            {{ option.label }}
+          </div>
+        </v-select>
+        <v-select
+          name="trendiing_time_span"
+          v-model="filtering.timeSpan"
+          id="trendiing_time_span"
+          @input="touch"
+          :clearable="false"
+          :searchable="false"
+          :options="['Daily', 'Weekly']"
+        >
+          <div slot="selected-option" slot-scope="option">
+            {{ option.label }}
+          </div>
+        </v-select>
+        <button @click="clearFiltering" v-if="filtering.touched">X</button>
+      </div>
+    </movie-list>
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from "vue";
-import Component from "vue-class-component";
 import MovieList from "@/components/MovieList.vue";
-import { api } from "@/api";
+import { request } from "@/api";
 
-import { movie } from "@/types";
-import TrendingObject = movie.TrendingObject;
-import { ApiResponse } from "apisauce";
+const INITIAL_FILTERING = {
+  type: "All",
+  timeSpan: "Daily",
+  touched: false
+};
 
-@Component({ components: { MovieList } })
-export default class Home extends Vue {
-  trending: { results: TrendingObject[] } = {
-    results: []
-  };
-
-  mounted() {
-    this.getTrendingMovies();
-  }
-
-  get trendingMovies(): null | TrendingObject[] {
-    if (this.trending) {
-      const { results } = this.trending;
-      return results;
+export default Vue.extend({
+  components: { MovieList },
+  data: () => ({
+    filtering: { type: "All", timeSpan: "Daily", touched: false },
+    trending: {}
+  }),
+  watch: {
+    filtering: {
+      immediate: true,
+      deep: true,
+      handler: function(val) {
+        this.fetchTrending(val.type, val.timeSpan);
+      }
     }
-    return null;
+  },
+  computed: {},
+  methods: {
+    fetchTrending(
+      type = this.filtering.type,
+      timeSpan = this.filtering.timeSpan
+    ) {
+      let realType = "all";
+      let realTimeSpan = "day";
+      switch (type) {
+        case "All":
+          realType = "all";
+          break;
+        case "Movie":
+          realType = "movie";
+          break;
+        case "TV":
+          realType = "tv";
+          break;
+        default:
+          realType = "all";
+      }
+      switch (timeSpan) {
+        case "Daily":
+          realTimeSpan = "day";
+          break;
+        case "Weekly":
+          realTimeSpan = "week";
+          break;
+        default:
+          realTimeSpan = "day";
+      }
+      request
+        .get(`/trending/${realType}/${realTimeSpan}`)
+        .then(response => {
+          this.trending = response.data;
+        })
+        .catch(error => {
+          throw new Error(error);
+        });
+    },
+    touch() {
+      this.filtering.touched = true;
+    },
+    clearFiltering() {
+      this.filtering = { ...INITIAL_FILTERING };
+    }
   }
-
-  getTrendingMovies(type = "all", timeSpan = "week") {
-    api
-      .get(`/trending/${type}/${timeSpan}`)
-      .then((response: ApiResponse<any>) => {
-        this.trending = response.data;
-      })
-      .catch((error: any) => {
-        throw new Error(error);
-      });
-  }
-}
+});
 </script>
 
 <style lang="scss">
@@ -51,10 +116,21 @@ export default class Home extends Vue {
   flex-direction: column;
 
   h1 {
-    margin: 40px 0 80px;
     font-weight: 900;
     font-size: 70px;
     color: $text-color;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
+.header_extra {
+  display: flex;
+
+  > * {
+    &:not(:last-child) {
+      margin-right: 3px;
+    }
   }
 }
 </style>

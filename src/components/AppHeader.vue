@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { api } from "@/api";
+import { request } from "@/api";
 
 export default {
   name: "AppHeader",
@@ -45,7 +45,7 @@ export default {
       this.$router.go(-1);
     },
     onSubmit() {
-      api
+      request
         .get(`/search/multi`, { query: this.query })
         .then(response => {
           const foundMovies = response.data.results.sort((a, b) => {

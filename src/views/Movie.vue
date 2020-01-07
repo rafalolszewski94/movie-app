@@ -14,7 +14,7 @@
           <p class="overview">{{ movie.overview | truncate(160) }}</p>
           <div class="rating-wrapper">
             <div class="stars">
-              <unicon name="star-filled" :fill="primaryFillColor" />
+<!--              <unicon name="star-filled" :fill="primaryFillColor" />-->
               <span>
                 avg: {{ movie.vote_average.toFixed(0) }}/10, votes:
                 {{ movie.vote_count }}
@@ -63,7 +63,7 @@
 import Vue from "vue";
 import { getImage } from "@/utils";
 import variables from "@/styles/_variables.scss";
-import { api } from "@/api";
+import { request } from "@/api";
 const imgPlaceholder = require("@/assets/image-loading@2x.png");
 
 export default Vue.extend({
@@ -74,7 +74,7 @@ export default Vue.extend({
   }),
 
   beforeRouteEnter(to, from, next) {
-    api
+    request
       .get(`/movie/${to.params.id}`, {
         append_to_response: "credits"
       })

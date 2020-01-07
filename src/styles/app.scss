@@ -1,4 +1,5 @@
 @import "~normalize.css";
+@import "./vueselect";
 
 .container {
   max-width: 800px;
@@ -62,11 +63,9 @@ table {
   */
   background-repeat: no-repeat;
 
-  background-image: var(--title-skeleton),
-    var(--card-skeleton);
+  background-image: var(--title-skeleton), var(--card-skeleton);
 
-  background-size: var(--title-width) var(--title-height),
-    100% 100%;
+  background-size: var(--title-width) var(--title-height), 100% 100%;
 
   background-position: var(--title-position), 0 0;
 }

@@ -2,6 +2,7 @@ import Vue from "vue";
 import Vuex from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import config from "@/store/config";
+import movies from "@/store/movies";
 
 Vue.use(Vuex);
 
@@ -10,7 +11,8 @@ const store = new Vuex.Store({
   mutations: {},
   actions: {},
   modules: {
-    config
+    config,
+    movies
   },
   plugins: [createPersistedState()]
 });

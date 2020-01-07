@@ -1,6 +1,9 @@
 <template>
   <div class="movie-list__wrapper">
-    <h1>{{ title }}</h1>
+    <div class="movie-list__header">
+      <h1>{{ title }}</h1>
+      <slot name="header_extra" />
+    </div>
     <div class="movie-list">
       <router-link
         class="movie"
@@ -49,12 +52,19 @@ export default {
 
 <style scoped lang="scss">
 h1 {
-  margin-top: 40px;
+  margin: 0;
 }
 
 .movie-list__wrapper {
   display: flex;
   flex-direction: column;
+}
+
+.movie-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 40px 0 80px;
 }
 
 .movie-list {
