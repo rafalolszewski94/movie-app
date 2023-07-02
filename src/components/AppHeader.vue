@@ -24,7 +24,7 @@ export default {
   name: "AppHeader",
   data: () => ({
     query: "",
-    scrolled: false
+    scrolled: false,
   }),
   created() {
     window.addEventListener("scroll", this.handleScroll);
@@ -35,7 +35,7 @@ export default {
   computed: {
     notHomeRoute() {
       return this.$store.state.route.name !== "home";
-    }
+    },
   },
   methods: {
     handleScroll() {
@@ -47,16 +47,16 @@ export default {
     onSubmit() {
       request
         .get(`/search/multi`, { query: this.query })
-        .then(response => {
+        .then((response) => {
           const foundMovies = response.data.results.sort((a, b) => {
             return b.popularity - a.popularity;
           });
         })
-        .catch(error => {
+        .catch((error) => {
           throw new Error(error);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 

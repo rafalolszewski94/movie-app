@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import createPersistedState from "vuex-persistedstate";
 import config from "@/store/config";
+import createPersistedState from "vuex-persistedstate";
 import movies from "@/store/movies";
 
 Vue.use(Vuex);

@@ -14,7 +14,7 @@
           <p class="overview">{{ movie.overview | truncate(160) }}</p>
           <div class="rating-wrapper">
             <div class="stars">
-<!--              <unicon name="star-filled" :fill="primaryFillColor" />-->
+              <!--              <unicon name="star-filled" :fill="primaryFillColor" />-->
               <span>
                 avg: {{ movie.vote_average.toFixed(0) }}/10, votes:
                 {{ movie.vote_count }}
@@ -70,16 +70,16 @@ export default Vue.extend({
   data: () => ({
     movie: undefined,
     initialized: false,
-    loading: true
+    loading: true,
   }),
 
   beforeRouteEnter(to, from, next) {
     request
       .get(`/movie/${to.params.id}`, {
-        append_to_response: "credits"
+        append_to_response: "credits",
       })
-      .then(response => {
-        next(async vm => {
+      .then((response) => {
+        next(async (vm) => {
           response.data.credits.cast.sort((a, b) => {
             return a.order - b.order;
           });
@@ -89,11 +89,11 @@ export default Vue.extend({
           return vm;
         });
       })
-      .catch(error => {
+      .catch((error) => {
         next();
       })
       .finally(() => {
-        next(async vm => {
+        next(async (vm) => {
           await vm.setData(true, "initialized");
           await vm.setData(false, "loading");
           return vm;
@@ -145,7 +145,7 @@ export default Vue.extend({
         return this.movie.name;
       }
       return "";
-    }
+    },
   },
 
   methods: {
@@ -160,8 +160,8 @@ export default Vue.extend({
     },
     isSelectedStar(starNumber) {
       return this.selectedStars >= starNumber;
-    }
-  }
+    },
+  },
 });
 </script>
 

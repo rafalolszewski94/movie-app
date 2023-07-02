@@ -1,6 +1,7 @@
-import { Module, VuexModule, Mutation, Action } from "vuex-module-decorators";
-import { request } from "@/api";
+import { Action, Module, Mutation, VuexModule } from "vuex-module-decorators";
+
 import { Movie } from "@/types";
+import { request } from "@/api";
 
 export interface Genre {
   id: number;

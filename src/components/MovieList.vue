@@ -30,13 +30,13 @@ export default {
   props: {
     title: {
       type: String,
-      default: "Movies"
+      default: "Movies",
     },
     movieList: {
       type: Array,
       required: true,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   methods: {
     displayPoster(path) {
@@ -45,8 +45,8 @@ export default {
 
     displaySmallPoster(path) {
       return getImage(path, "w45");
-    }
-  }
+    },
+  },
 };
 </script>
 

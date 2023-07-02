@@ -20,14 +20,14 @@ export default {
     getConfig() {
       request
         .get("/configuration")
-        .then(response => {
+        .then((response) => {
           this.$store.dispatch("config/setConfig", response.data);
         })
-        .catch(error => {
+        .catch((error) => {
           throw new Error(error);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 

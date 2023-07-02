@@ -24,32 +24,32 @@ export default {
     src: String,
     srcPlaceholder: String,
     srcset: {
-      type: String
+      type: String,
     },
     intersectionOptions: {
       type: Object,
       default: function() {
         return {};
-      }
+      },
     },
     usePicture: {
       type: Boolean,
-      default: false
+      default: false,
     },
     blurLevel: {
       type: Number,
-      default: 30
+      default: 30,
     },
     duration: {
       type: Number,
-      default: 500
-    }
+      default: 500,
+    },
   },
   data: () => ({ rate: 1 }),
   computed: {
     deviation() {
       return this.blurLevel * this.rate;
-    }
+    },
   },
   methods: {
     animate() {
@@ -67,8 +67,8 @@ export default {
       };
 
       requestAnimationFrame(step);
-    }
-  }
+    },
+  },
 };
 </script>
 
