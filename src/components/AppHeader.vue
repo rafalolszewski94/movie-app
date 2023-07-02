@@ -13,14 +13,14 @@ const notHomeRoute = computed(() => {
 </script>
 
 <template>
-  <div class="pb-8">
-    <header class="fixed top-0">
-      <nav class="flex">
-        <RouterLink to="/">
-          <h2 class="text-2xl font-bold"><span class="text-green-500">M</span>DB</h2>
-        </RouterLink>
-        <button @click="routerGoBack" v-if="notHomeRoute" class="go-back-btn">go back</button>
-      </nav>
-    </header>
-  </div>
+  <header class="sticky top-0 py-3 mb-6 z-10 px-2">
+    <nav class="flex justify-between bg-black/70 backdrop-blur-md rounded-lg px-4">
+      <RouterLink to="/" class="py-2 px-4 -mx-4">
+        <h2 class="text-2xl font-bold"><span class="text-orange-500">M</span>DB Trending</h2>
+      </RouterLink>
+      <button @click="routerGoBack" v-if="notHomeRoute" class="py-2 px-4 -mx-4 font-semibold">
+        Back
+      </button>
+    </nav>
+  </header>
 </template>
