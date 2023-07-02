@@ -74,8 +74,12 @@ const movie = ref()
 const initialized = ref(false)
 const loading = ref(true)
 
+const isTVRoute = computed(() => {
+  return route.path.includes('/tv/')
+})
+
 await request
-  .get(`/movie/${route.params.id}`, {
+  .get(`/${isTVRoute.value ? 'tv' : 'movie'}/${route.params.id}`, {
     append_to_response: 'credits'
   })
   .then((response) => {
