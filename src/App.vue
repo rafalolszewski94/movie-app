@@ -17,7 +17,7 @@ request
 </script>
 
 <template>
-  <div>
+  <div class="max-h-screen overflow-hidden relative">
     <AppHeader />
     <Suspense>
       <RouterView />

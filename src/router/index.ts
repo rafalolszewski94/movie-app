@@ -20,6 +20,11 @@ const router = createRouter({
       name: 'tv-detail',
       component: () => import('../views/Movie.vue')
     },
+    {
+      path: '/person/:id',
+      name: 'person-detail',
+      component: () => import('../views/Person.vue')
+    },
   ]
 })
 

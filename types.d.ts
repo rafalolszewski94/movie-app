@@ -49,6 +49,8 @@ export interface Movie {
   vote_count: number;
 }
 
+export interface TVShow extends Movie { }
+
 export interface MovieWithCast extends Movie {
   credits: {
     cast: {
